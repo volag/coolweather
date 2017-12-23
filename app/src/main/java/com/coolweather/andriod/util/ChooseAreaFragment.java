@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import com.coolweather.andriod.MainActivity;
 import com.coolweather.andriod.R;
 import com.coolweather.andriod.WeatherActivity;
 import com.coolweather.andriod.db.City;
@@ -37,7 +37,6 @@ import okhttp3.Response;
  */
 
 public class ChooseAreaFragment extends Fragment {
-    private static final String TAG = "123";
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
@@ -94,16 +93,19 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCity=cityList.get(position);
                     queryCounties();
                 }else if(currentLevel==LEVEL_COUNTY){
-                    County county = countyList.get(position);
-                    System.out.println(county.getCountyName()+"123");
-                    System.out.println(county.getCityId()+"123");
-                    System.out.println(county.getWeatherId()+"123");
-                    String weatherId = countyList.get(position).getWeatherId();//weatherId为空值
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    intent.putExtra("weather_id",weatherId);
-                    System.out.println(weatherId+"123");
-                    startActivity(intent);
-                     getActivity().finish();
+                    String weatherId = countyList.get(position).getWeatherId();
+                    if(getActivity()instanceof MainActivity){
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id",weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }else if(getActivity()instanceof WeatherActivity){
+                        WeatherActivity activity = (WeatherActivity)getActivity();
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefresh.setRefreshing(true);
+                        activity.requestWeather(weatherId);
+                    }
+
                 }
             }
         });
@@ -166,12 +168,11 @@ public class ChooseAreaFragment extends Fragment {
         titleText.setText(selectedCity.getCityName());
         backbutton.setVisibility(View.VISIBLE);
         countyList = DataSupport.where("cityid = ?",String .valueOf(selectedCity.getId())).find(County.class);
-        County cou = countyList.get(1);
-        System.out.println(cou.getWeatherId()+"123");
         if(countyList.size()>0){
             dataList.clear();
             for(County county: countyList){
                 dataList.add(county.getCountyName());
+                System.out.println(county.getWeatherId()+"123");
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
