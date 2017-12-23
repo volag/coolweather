@@ -1,10 +1,9 @@
-package com.coolweather.andriod.util;
+package com.coolweather.andriod;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.coolweather.andriod.MainActivity;
-import com.coolweather.andriod.R;
-import com.coolweather.andriod.WeatherActivity;
 import com.coolweather.andriod.db.City;
 import com.coolweather.andriod.db.County;
 import com.coolweather.andriod.db.Province;
+import com.coolweather.andriod.util.HttpUtil;
+import com.coolweather.andriod.util.Utility;
 
 import org.litepal.crud.DataSupport;
 
@@ -33,7 +31,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
- * Created by cute on 2017/12/21.
+ * Created by cute on 2017/12/23.
  */
 
 public class ChooseAreaFragment extends Fragment {
@@ -47,11 +45,11 @@ public class ChooseAreaFragment extends Fragment {
     private ArrayAdapter<String> adapter;
     private List<String> dataList = new ArrayList<>();
     /**
-    * 省列表
+     * 省列表
      */
     private List<Province> provinceList;
     /**
-    ** 市列表
+     ** 市列表
      */
     private  List<City> cityList;
     /*
@@ -93,9 +91,12 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCity=cityList.get(position);
                     queryCounties();
                 }else if(currentLevel==LEVEL_COUNTY){
-                    String weatherId = countyList.get(position).getWeatherId();
+                    System.out.println("------------current------------");
+                   String weatherId =  countyList.get(position).getWeatherId();
+//                    String weatherId = "CN101190401";
                     if(getActivity()instanceof MainActivity){
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        System.out.println("------------"+ weatherId +"------------");
                         intent.putExtra("weather_id",weatherId);
                         startActivity(intent);
                         getActivity().finish();
@@ -131,6 +132,8 @@ public class ChooseAreaFragment extends Fragment {
             dataList.clear();
             for(Province province : provinceList){
                 dataList.add(province.getProvinceName());
+                System.out.println(province.getProvinceName()+"province.getname()");
+
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
@@ -151,6 +154,7 @@ public class ChooseAreaFragment extends Fragment {
             dataList.clear();
             for(City city :cityList){
                 dataList.add(city.getCityName());
+                System.out.println(city.getCityName()+"cityname");
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
@@ -167,22 +171,30 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCounties(){
         titleText.setText(selectedCity.getCityName());
         backbutton.setVisibility(View.VISIBLE);
-        countyList = DataSupport.where("cityid = ?",String .valueOf(selectedCity.getId())).find(County.class);
+        countyList = DataSupport.where("cityid=?",String.valueOf(selectedCity.getId())).find(County.class);
+//        for(County county: countyList) {
+//            System.out.println(county.getCityId()+"countycityid");
+//            System.out.println(county.getCountyName()+"countyname");
+//            System.out.println(county.getId()+"countyid");
+//        }
         if(countyList.size()>0){
             dataList.clear();
             for(County county: countyList){
                 dataList.add(county.getCountyName());
-                System.out.println(county.getWeatherId()+"123");
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
             currentLevel=LEVEL_COUNTY;
         }else{
+            System.out.println("----------1-------------");
             int provinceCode= selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
+            System.out.println("----------2-------------");
             String  address = "http://guolin.tech/api/china/"+ provinceCode +"/"+ cityCode;
             queryFromServer(address,"county");
+            System.out.println("----------3-------------");
         }
+
     }
     /**
      * 根据传入的地址和类型从服务器上查询省市县数据
@@ -195,11 +207,15 @@ public class ChooseAreaFragment extends Fragment {
                 String responseText = response.body().string();
                 boolean result = false;
                 if("province".equals(type)){
-                    result = Utility.handleProvinceRespones(responseText);
+                    System.out.println("--------------province" + result);
+                    result = Utility.handleProvinceResponse(responseText);
                 }else if("city".equals(type)){
+                    System.out.println("--------------city" + result);
                     result = Utility.handleCityResponse(responseText,selectedProvince.getId());
                 }else if("county".equals(type)){
+                    System.out.println("--------------y" + result);
                     result = Utility.handleCountyResponse(responseText,selectedCity.getId());
+                    System.out.println("--------------x" + result);
                 }
                 if(result){
                     getActivity().runOnUiThread(new Runnable() {
@@ -221,10 +237,10 @@ public class ChooseAreaFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
-                        public void run(){
-                            closeProgressDialog();
-                            Toast.makeText(getContext(),"加载失败",Toast.LENGTH_SHORT).show();
-                        }
+                    public void run(){
+                        closeProgressDialog();
+                        Toast.makeText(getContext(),"加载失败",Toast.LENGTH_SHORT).show();
+                    }
                 });
             }
         });

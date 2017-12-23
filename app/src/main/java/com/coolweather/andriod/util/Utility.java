@@ -25,7 +25,9 @@ public class Utility {
         try{
             JSONObject jsonObject = new JSONObject(response);
             JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            System.out.println(jsonArray.toString());
             String weatherContent = jsonArray.getJSONObject(0).toString();
+            System.out.println(weatherContent);
             return new Gson().fromJson(weatherContent,Weather.class);
         }catch(Exception e){
             e.printStackTrace();
@@ -35,7 +37,7 @@ public class Utility {
     /*
     * 解析和处理服务器返回的省级数据
     * */
-    public static boolean handleProvinceRespones(String response){
+    public static boolean handleProvinceResponse(String response){
         if(!TextUtils.isEmpty(response)){
             try{
                 JSONArray allProvinces = new JSONArray(response);
@@ -56,10 +58,10 @@ public class Utility {
     /*
     * 解析和处理服务器返回的市级数据
     * */
-    public static  boolean handleCityResponse(String respones,int provinceId){
-        if(!TextUtils.isEmpty(respones)){
+    public static  boolean handleCityResponse(String response,int provinceId){
+        if(!TextUtils.isEmpty(response)){
             try{
-                JSONArray allCities = new JSONArray(respones);
+                JSONArray allCities = new JSONArray(response);
                 for(int i=0;i<allCities.length();i++){
                     JSONObject cityObject =allCities.getJSONObject(i);
                     City city = new City();
@@ -78,15 +80,16 @@ public class Utility {
       /*
     * 解析和处理服务器返回的县级数据
     * */
-      public  static boolean handleCountyResponse(String respone,int cityId){
-          if(!TextUtils.isEmpty(respone)){
+      public  static boolean handleCountyResponse(String response,int cityId){
+          if(!TextUtils.isEmpty(response)){
               try{
-                  JSONArray allCounties = new JSONArray(respone);
+                  JSONArray allCounties = new JSONArray(response);
                   for(int i=0;i<allCounties.length();i++){
                       JSONObject countyObject =allCounties.getJSONObject(i);
                       County county = new County();
                       county.setCountyName(countyObject.getString("name"));
-                      county.setCityId(countyObject.getInt("id"));
+                      county.setWeatherId(countyObject.getString("weather_id"));
+                      System.out.println("----------" + county.getWeatherId());
                       county.setCityId(cityId);
                       county.save();
                   }

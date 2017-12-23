@@ -58,7 +58,11 @@ public class WeatherActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        navButton = (Button)findViewById(R.id.nav_button);
+        View view = getLayoutInflater().inflate(R.layout.title,null);
+        navButton = (Button)view.findViewById(R.id.nav_button);
+        if(navButton == null){
+            System.out.println("navButton is null");
+        }
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +101,7 @@ public class WeatherActivity extends AppCompatActivity {
         if(weatherString!=null){
             Weather weather = Utility.handleWeatherResponse(weatherString);
             mWeatherId = weather.basic.weatherId;
+//            mWeatherId = "CN101190401";
             showWeatherInfo(weather);
         }else{
             mWeatherId = getIntent().getStringExtra("weather_id");
@@ -116,7 +121,7 @@ public class WeatherActivity extends AppCompatActivity {
      */
     public  void requestWeather(final String weatherId){
         String weatherUrl = "http://guolin.tech/api/weather?cityid="+
-                weatherId + "&key=bc0418b57b2d4918819d3974ac1285d9";
+                weatherId + "&key=75b9766cc0a140be98eae669a8030be3 ";
         HttpUtil.sendOKHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -125,6 +130,12 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(weather == null){
+                            System.out.println("weather is null");
+                        }
+                        if(!"ok".equals(weather.status)){
+                            System.out.println("status is not ok");
+                        }
                         if(weather!=null&&"ok".equals(weather.status)){
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("weather",responseText);
