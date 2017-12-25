@@ -24,10 +24,10 @@ public class Utility {
     public  static Weather handleWeatherResponse(String response){
         try{
             JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
-            System.out.println(jsonArray.toString());
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");  //获得的数据为空
+            System.out.println(jsonArray.toString()+"213123");
             String weatherContent = jsonArray.getJSONObject(0).toString();
-            System.out.println(weatherContent);
+            System.out.println(weatherContent+"123");
             return new Gson().fromJson(weatherContent,Weather.class);
         }catch(Exception e){
             e.printStackTrace();

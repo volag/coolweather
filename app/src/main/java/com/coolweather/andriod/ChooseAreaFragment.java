@@ -93,7 +93,6 @@ public class ChooseAreaFragment extends Fragment {
                 }else if(currentLevel==LEVEL_COUNTY){
                     System.out.println("------------current------------");
                    String weatherId =  countyList.get(position).getWeatherId();
-//                    String weatherId = "CN101190401";
                     if(getActivity()instanceof MainActivity){
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
                         System.out.println("------------"+ weatherId +"------------");
@@ -172,11 +171,6 @@ public class ChooseAreaFragment extends Fragment {
         titleText.setText(selectedCity.getCityName());
         backbutton.setVisibility(View.VISIBLE);
         countyList = DataSupport.where("cityid=?",String.valueOf(selectedCity.getId())).find(County.class);
-//        for(County county: countyList) {
-//            System.out.println(county.getCityId()+"countycityid");
-//            System.out.println(county.getCountyName()+"countyname");
-//            System.out.println(county.getId()+"countyid");
-//        }
         if(countyList.size()>0){
             dataList.clear();
             for(County county: countyList){

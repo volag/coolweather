@@ -10,14 +10,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/degree_text"
         android:textColor="#fff"
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:textSize="60sp"
         />
     <TextView
         android:id="@+id/weather_info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
+        android:layout_gravity="center"
         android:textSize="20sp"
         android:textColor="#fff"
         />
